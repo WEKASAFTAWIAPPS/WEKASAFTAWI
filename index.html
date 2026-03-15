@@ -1,647 +1,162 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ويكا صفطاوي - تحميل الفيديوهات</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                        repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 10px);
-            pointer-events: none;
-        }
-
-        .container {
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            padding: 40px 20px;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            font-size: 48px;
-            font-weight: 900;
-            color: #fff;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.2), 5px 5px 0 rgba(0,0,0,0.1);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            animation: glow 2s ease-in-out infinite;
-        }
-
-        .logo span {
-            color: #ffd700;
-            background: rgba(255,255,255,0.1);
-            padding: 5px 15px;
-            border-radius: 50px;
-            display: inline-block;
-            backdrop-filter: blur(5px);
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .subtitle {
-            color: rgba(255,255,255,0.9);
-            font-size: 18px;
-            margin-top: 10px;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
-        }
-
-        .search-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 40px;
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        .search-title {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .url-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 18px 25px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .url-input:focus {
-            outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1);
-        }
-
-        .download-btn {
-            padding: 18px 40px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .platforms {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .platform-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 25px 15px;
-            text-align: center;
-            color: white;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .platform-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .platform-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .platform-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .quality-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .quality-title {
-            color: white;
-            font-size: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .quality-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .tab-btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-
-        .tab-btn.active {
-            background: #ffd700;
-            color: #333;
-        }
-
-        .quality-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .quality-card {
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .quality-card:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: #ffd700;
-            transform: scale(1.05);
-        }
-
-        .quality-card.selected {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.2);
-        }
-
-        .quality-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .quality-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #ffd700;
-            color: #333;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 8px;
-        }
-
-        .result-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 40px;
-            display: none;
-            animation: slideUp 0.5s ease;
-        }
-
-        .video-info {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .video-thumbnail {
-            width: 200px;
-            height: 120px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 40px;
-        }
-
-        .video-details {
-            flex: 1;
-        }
-
-        .video-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .download-now-btn {
-            padding: 15px 40px;
-            background: #ffd700;
-            color: #333;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .download-now-btn:hover {
-            background: #ffed4a;
-            transform: translateY(-2px);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 60px;
-        }
-
-        .feature-item {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .feature-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            width: 80px;
-            height: 80px;
-            line-height: 80px;
-            border-radius: 50%;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255,255,255,0.8);
-            margin-top: 60px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        @keyframes glow {
-            0%, 100% { text-shadow: 3px 3px 0 rgba(0,0,0,0.2), 5px 5px 0 rgba(0,0,0,0.1); }
-            50% { text-shadow: 3px 3px 10px rgba(255,255,255,0.5), 5px 5px 20px rgba(255,255,255,0.3); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .logo { font-size: 36px; }
-            .input-group { flex-direction: column; }
-            .download-btn { width: 100%; justify-content: center; }
-            .video-info { flex-direction: column; text-align: center; }
-            .video-thumbnail { width: 100%; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <span>ويكا صفطاوي</span>
-            </div>
-            <div class="subtitle">منصتك الشاملة لتحميل الفيديوهات بجودات متعددة</div>
-        </div>
-
-        <div class="search-section">
-            <h2 class="search-title">الصق رابط الفيديو للتحميل</h2>
-            <div class="input-group">
-                <input type="url" class="url-input" placeholder="https://youtube.com/watch?v=..." id="videoUrl">
-                <button class="download-btn" onclick="fetchVideoInfo()">
-                    <span>🔍</span> بحث
-                </button>
-            </div>
-        </div>
-
-        <div class="platforms">
-            <div class="platform-card" onclick="setPlatform('youtube')">
-                <span class="platform-icon">📺</span>
-                <div class="platform-name">YouTube</div>
-            </div>
-            <div class="platform-card" onclick="setPlatform('tiktok')">
-                <span class="platform-icon">🎵</span>
-                <div class="platform-name">TikTok</div>
-            </div>
-            <div class="platform-card" onclick="setPlatform('instagram')">
-                <span class="platform-icon">📷</span>
-                <div class="platform-name">Instagram</div>
-            </div>
-            <div class="platform-card" onclick="setPlatform('facebook')">
-                <span class="platform-icon">👤</span>
-                <div class="platform-name">Facebook</div>
-            </div>
-            <div class="platform-card" onclick="setPlatform('twitter')">
-                <span class="platform-icon">🐦</span>
-                <div class="platform-name">Twitter</div>
-            </div>
-        </div>
-
-        <div class="quality-section" id="qualitySection" style="display: none;">
-            <h3 class="quality-title">اختر جودة التحميل</h3>
-            
-            <div class="quality-tabs">
-                <button class="tab-btn active" onclick="switchTab('mp4')" id="mp4Tab">🎬 MP4</button>
-                <button class="tab-btn" onclick="switchTab('mp3')" id="mp3Tab">🎵 MP3</button>
-            </div>
-
-            <div class="quality-grid" id="mp4Qualities">
-                <div class="quality-card" onclick="selectQuality('2160p')">
-                    <div class="quality-name">4K</div>
-                    <span class="quality-badge">2160p</span>
-                </div>
-                <div class="quality-card" onclick="selectQuality('1080p')">
-                    <div class="quality-name">Full HD</div>
-                    <span class="quality-badge">1080p</span>
-                </div>
-                <div class="quality-card" onclick="selectQuality('720p')">
-                    <div class="quality-name">HD</div>
-                    <span class="quality-badge">720p</span>
-                </div>
-                <div class="quality-card" onclick="selectQuality('480p')">
-                    <div class="quality-name">SD</div>
-                    <span class="quality-badge">480p</span>
-                </div>
-            </div>
-
-            <div class="quality-grid" id="mp3Qualities" style="display: none;">
-                <div class="quality-card" onclick="selectQuality('320')">
-                    <div class="quality-name">320 kbps</div>
-                    <span class="quality-badge">عالي جداً</span>
-                </div>
-                <div class="quality-card" onclick="selectQuality('192')">
-                    <div class="quality-name">192 kbps</div>
-                    <span class="quality-badge">عالي</span>
-                </div>
-                <div class="quality-card" onclick="selectQuality('128')">
-                    <div class="quality-name">128 kbps</div>
-                    <span class="quality-badge">متوسط</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="result-section" id="resultSection">
-            <div class="video-info">
-                <div class="video-thumbnail" id="videoThumbnail">
-                    🎬
-                </div>
-                <div class="video-details">
-                    <div class="video-title" id="videoTitle">عنوان الفيديو</div>
-                    <button class="download-now-btn" onclick="startDownload()" id="downloadBtn">
-                        ⬇️ تحميل الآن
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="features">
-            <div class="feature-item">
-                <span class="feature-icon">⚡</span>
-                <div class="feature-title">تحميل سريع</div>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">🎯</span>
-                <div class="feature-title">جميع الجودات</div>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">🌍</span>
-                <div class="feature-title">جميع المنصات</div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>© 2024 ويكا صفطاوي - جميع الحقوق محفوظة</p>
-        </div>
-    </div>
-
-    <script>
-        let currentTab = 'mp4';
-        let selectedQuality = '1080p';
-        let currentVideoUrl = '';
-        let currentPlatform = 'youtube';
-
-        function setPlatform(platform) {
-            currentPlatform = platform;
-            const placeholders = {
-                youtube: 'https://youtube.com/watch?v=...',
-                tiktok: 'https://tiktok.com/@user/video/...',
-                instagram: 'https://instagram.com/p/...',
-                facebook: 'https://facebook.com/watch/...',
-                twitter: 'https://twitter.com/i/status/...'
-            };
-            document.getElementById('videoUrl').placeholder = placeholders[platform] || placeholders.youtube;
-        }
-
-        function fetchVideoInfo() {
-            const url = document.getElementById('videoUrl').value;
-            if (!url) {
-                alert('الرجاء إدخال رابط الفيديو');
-                return;
-            }
-
-            currentVideoUrl = url;
-            
-            // إظهار أقسام الجودة والنتيجة
-            document.getElementById('qualitySection').style.display = 'block';
-            document.getElementById('resultSection').style.display = 'block';
-            
-            // محاكاة جلب معلومات الفيديو
-            document.getElementById('videoTitle').textContent = 'فيديو من ' + currentPlatform;
-            
-            // تجهيز رابط التحميل المباشر
-            prepareDownloadLink();
-        }
-
-        function switchTab(tab) {
-            currentTab = tab;
-            
-            document.getElementById('mp4Tab').classList.remove('active');
-            document.getElementById('mp3Tab').classList.remove('active');
-            
-            if (tab === 'mp4') {
-                document.getElementById('mp4Tab').classList.add('active');
-                document.getElementById('mp4Qualities').style.display = 'grid';
-                document.getElementById('mp3Qualities').style.display = 'none';
-                selectedQuality = '1080p';
-            } else {
-                document.getElementById('mp3Tab').classList.add('active');
-                document.getElementById('mp4Qualities').style.display = 'none';
-                document.getElementById('mp3Qualities').style.display = 'grid';
-                selectedQuality = '320';
-            }
-            
-            prepareDownloadLink();
-        }
-
-        function selectQuality(quality) {
-            selectedQuality = quality;
-            
-            document.querySelectorAll('.quality-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-            
-            prepareDownloadLink();
-        }
-
-        function prepareDownloadLink() {
-            // تجهيز رابط التحميل حسب المنصة والجودة
-            let downloadUrl = '';
-            
-            if (currentPlatform === 'youtube') {
-                if (currentTab === 'mp4') {
-                    // خدمات تحميل يوتيوب
-                    if (selectedQuality === '2160p') {
-                        downloadUrl = `https://www.y2mate.com/youtube/${currentVideoUrl}`;
-                    } else {
-                        downloadUrl = `https://en.savefrom.net/${currentVideoUrl}/`;
-                    }
-                } else {
-                    // تحميل MP3
-                    downloadUrl = `https://www.y2mate.com/youtube-mp3/${currentVideoUrl}`;
-                }
-            } else if (currentPlatform === 'tiktok') {
-                downloadUrl = `https://tiktokdownload.online/${currentVideoUrl}`;
-            } else if (currentPlatform === 'instagram') {
-                downloadUrl = `https://snapinsta.app/${currentVideoUrl}`;
-            } else if (currentPlatform === 'facebook') {
-                downloadUrl = `https://fdown.net/${currentVideoUrl}`;
-            } else {
-                downloadUrl = `https://en.savefrom.net/${currentVideoUrl}/`;
-            }
-            
-            // تخزين الرابط في زر التحميل
-            document.getElementById('downloadBtn').setAttribute('data-download-url', downloadUrl);
-        }
-
-        function startDownload() {
-            if (!currentVideoUrl) {
-                alert('الرجاء إدخال رابط الفيديو أولاً');
-                return;
-            }
-
-            const downloadBtn = document.getElementById('downloadBtn');
-            const downloadUrl = downloadBtn.getAttribute('data-download-url');
-            
-            // تغيير نص الزر لإظهار التحميل
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<span class="loading"></span> جاري التحميل...';
-            downloadBtn.disabled = true;
-            
-            // فتح رابط التحميل في نافذة جديدة
-            setTimeout(() => {
-                window.open(downloadUrl, '_blank');
-                
-                // إعادة الزر لحالته الطبيعية
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.disabled = false;
-            }, 1000);
-        }
-
-        // تحميل مباشر باستخدام APIs متعددة
-        function directDownload(url, format, quality) {
-            // قائمة APIs للتحميل المباشر
-            const apis = [
-                `https://api.vevioz.com/api/button/${format}/${url}`,
-                `https://youtube-downloader-api.com/download?url=${encodeURIComponent(url)}&format=${format}`,
-                `https://all-convert.com/convert?url=${encodeURIComponent(url)}&to=${format}`
-            ];
-            
-            // تجربة API بعد الأخرى
-            return apis[0];
-        }
-
-        // تهيئة الصفحة
-        setPlatform('youtube');
-    </script>
-</body>
-</html>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+  .dev-wrapper {
+    direction: rtl;
+    font-family: 'Cairo', sans-serif;
+    color: #fff;
+    background: #050505;
+    padding: 20px;
+    border-radius: 30px;
+    max-width: 800px;
+    margin: 20px auto;
+    border: 1px solid #00d2ff;
+    box-shadow: 0 0 40px rgba(0, 210, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* تأثير النبض الضوئي خلف الصورة */
+  .dev-header {
+    text-align: center;
+    position: relative;
+    padding: 30px 0;
+  }
+
+  .dev-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #00d2ff;
+    padding: 5px;
+    box-shadow: 0 0 20px #00d2ff;
+    transition: 0.5s;
+    object-fit: cover;
+  }
+  .dev-avatar:hover {
+    transform: rotate(10deg) scale(1.1);
+  }
+
+  .dev-name {
+    font-size: 32px;
+    font-weight: 900;
+    margin-top: 15px;
+    background: linear-gradient(to left, #00d2ff, #3a7bd5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  }
+
+  /* شبكة المهارات التفاعلية */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+  }
+
+  .skill-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    transition: 0.3s;
+  }
+  .skill-card:hover {
+    background: #00d2ff;
+    color: #000;
+    font-weight: bold;
+    transform: translateY(-5px);
+  }
+
+  /* بانر الإنجازات المتحرك */
+  .achieve-banner {
+    background: linear-gradient(90deg, #1a1a1a, #00d2ff, #1a1a1a);
+    background-size: 200% auto;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    animation: moveBg 4s linear infinite;
+    margin: 20px 0;
+  }
+  @keyframes moveBg { to { background-position: 200% center; } }
+
+  /* روابط التواصل الاجتماعي */
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  .social-btn {
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.4s;
+    font-size: 14px;
+    color: #fff !important;
+  }
+  .tg { background: #0088cc; box-shadow: 0 4px 15px rgba(0,136,204,0.4); }
+  .yt { background: #ff0000; box-shadow: 0 4px 15px rgba(255,0,0,0.4); }
+  .wa { background: #25d366; box-shadow: 0 4px 15px rgba(37,211,102,0.4); }
+
+  .social-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+  /* إحصائيات المطور */
+  .stats-table {
+    width: 100%;
+    background: rgba(255,255,255,0.02);
+    border-radius: 15px;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+  .stats-table td { padding: 15px; border-bottom: 1px solid #111; }
+  .stat-val { color: #00d2ff; font-weight: bold; text-align: left; }
+
+</style>
+
+<div class="dev-wrapper">
+  
+  <div class="dev-header">
+    <img alt="ويكا صفطاوي" class="dev-avatar" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiqmXLzr_VcklGP3ZtiU_tPlEODES-CuCvyW3thbcPjs-fmwqJHiUWRdOLhApPDAdtpIv0mhFbnhhV-Pg94DluiUwHtL82j-hgmug9cxGqYcZ0foCa1c-UpRp1u4dHNf8W6CMFVvKTF4R0G_VcPWWAIlxPhaHaPSVXROkHesT0EFzIQYR6_K47aQTrbIK66/s1280/photo_.png" />
+    <h1 class="dev-name">المطور ويكا صفطاوي</h1>
+    <p style="color: #aaaaaa;">خبير تعديل تطبيقات الأندروبد</p>
+  </div>
+
+  <div class="achieve-banner">🚀 مبتكر سلسلة LF WhatsApp الشهيرة</div>
+
+  <p style="color: #eeeeee; line-height: 1.8; text-align: center;">
+    أهلاً بكم في عالمي! أنا ويكا صفطاوي متخصص في تطوير وتعديل نسخ الواتساب بأحدث التقنيات البرمجية. هدفي هو تقديم تجربة مستخدم آمنة، سريعة، وفريدة من نوعها تلبي تطلعات "المجال" في 2026.
+  </p>
+
+  <div class="skills-grid">
+    <div class="skill-card">💻 برمجة Android</div>
+    <div class="skill-card">🛡️ تخطي الحظر</div>
+    <div class="skill-card">🎨 تصميم UI/UX</div>
+    <div class="skill-card">⚡ تحسين الأداء</div>
+  </div>
+
+  <table class="stats-table">
+    <tbody><tr>
+      <td>خبرة في المجال</td>
+      <td class="stat-val">+5 سنوات</td>
+    </tr>
+    <tr>
+      <td>إجمالي التحديثات</td>
+      <td class="stat-val">50K App</td>
+    </tr>
+    <tr>
+      <td>حالة الدعم الفني</td>
+      <td class="stat-val" style="color: #25d366;">متصل الآن 🟢</td>
+    </tr>
+  </tbody></table>
+
+  <div class="social-links">
+    <a class="social-btn tg" href="https://t.me/WEKA_SAFTAWI">قناة تليجرام</a>
+    <a class="social-btn yt" href="https://www.youtube.com/@WEKA_SAFTAWI">يوتيوب</a>
+  </div>
+</div>
